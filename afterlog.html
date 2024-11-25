@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Threat Detection System</title>
+    <link rel="stylesheet" href="afterlog.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1>Real-Time Threat Detection</h1>
+            <div class="user-settings">
+                <span class="username">User: Dikshya</span>
+                <button class="settings-button">
+                    <img src="https://cdn-icons-png.flaticon.com/128/2099/2099058.png" alt="Settings Icon" class="settings-icon">
+                    Settings
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="left-panel">
+                <div class="live-feed">
+                    <h2>Live Surveillance Feed</h2>
+                    <div class="feed">
+                        <!-- Webcam Stream -->
+                        <video id="webcam" width="640" height="480" autoplay muted></video>
+                    </div>
+                    <div class="feed-status">
+                        <p>Monitoring Active: Loading...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <h2>Recent Threat Alerts</h2>
+                <div id="alert-container">
+                    <!-- Alert cards will be populated here by fetchAlerts() -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Threat Detection System</p>
+    </footer>
+
+    <!-- JavaScript Integration -->
+    <script>
+        // Access the webcam using getUserMedia API
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                const videoElement = document.getElementById('webcam');
+                videoElement.srcObject = stream;
+                videoElement.play();
+                document.querySelector('.feed-status p').textContent = 'Monitoring Active: Webcam Feed';
+            })
+            .catch(error => {
+                console.error('Error accessing webcam:', error);
+                document.querySelector('.feed-status p').textContent = 'Error accessing webcam';
+            });
+
+        // Fetch data from the backend API for threat alerts
+        fetch('http://localhost:3000/api/alerts')
+            .then(response => response.json())  // Parse the response as JSON
+            .then(data => {
+                console.log(data);  // Log it to the console to verify
+                displayAlerts(data);  // Function to display data in HTML
+            })
+            .catch(error => {
+                console.error('Error fetching alerts:', error);  // Handle errors
+            });
+
+        // Function to display alerts on the webpage
+        function displayAlerts(alerts) {
+            const alertContainer = document.getElementById('alert-container');
+            alerts.forEach(alert => {
+                const alertCard = document.createElement('div');
+                alertCard.classList.add('alert-card');
+                
+                alertCard.innerHTML = `
+                    <h3>Alert Type: ${alert.type}</h3>
+                    <p>Location: ${alert.location}</p>
+                    <p>Time: ${alert.time}</p>
+                `;
+                
+                alertContainer.appendChild(alertCard);  // Append the new alert card
+            });
+        }
+    </script>
+</body>
+</html>
+
